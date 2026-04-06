@@ -1,0 +1,27 @@
+class BinaryTree:
+    def init(self, value, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+    def __get_height(self, node) -> int:
+        if node is None:
+            return 0
+        return 1 + max(self.__get_height(node.left), self.__get_height(node.right))
+
+    def __check_balance(self, node) -> bool:
+        if node is None:
+            return True
+
+        left_h = self.__get_height(node.left)
+
+        right_h = self.__get_height(node.right)
+
+        current_balanced = abs(left_h - right_h) <= 1
+
+        return (current_balanced and
+                self.__check_balance(node.left) and
+                self.__check_balance(node.right))
+
+    def is_balanced(self) -> bool:
+        return self.__check_balance(self)
