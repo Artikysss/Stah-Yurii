@@ -1,0 +1,110 @@
+import collections
+import os
+
+
+class KnightSolution:
+    def __init__(self, n):
+        self.n = n
+        self.direction = [
+            (-1, -2), (-1, 2), (1, -2), (1, 2),
+            (-2, -1), (-2, 1), (2, -1), (2, 1)
+        ]
+
+    def get_moves(self, current_posit):
+        moves = []
+        curr_x, curr_y = current_posit
+        for dx, dy in self.direction:
+            next_x = curr_x + dx
+            next_y = curr_y + dy
+
+            if 0 <= next_x < self.n and 0 <= next_y < self.n:
+                moves.append((next_x, next_y))
+        return moves
+
+    def find_shortest_way(self, start_x, start_y, finish_x, finish_y):
+        result_path = []
+        if start_x == finish_x and start_y == finish_y:
+            return [(start_x, start_y)]
+
+        parents = {(start_x, start_y): None}
+        queue = collections.deque([(start_x, start_y)])
+        is_found = False
+
+        while queue and not is_found:
+            current_posit = queue.popleft()
+
+            if current_posit == (finish_x, finish_y):
+                is_found = True
+            else:
+                for next_posit in self.get_moves(current_posit):
+                    if next_posit not in parents:
+                        parents[next_posit] = current_posit
+                        queue.append(next_posit)
+
+        if is_found:
+            current = (finish_x, finish_y)
+            while current is not None:
+                result_path.append(current)
+                current = parents[current]
+            result_path.reverse()
+
+        return result_path
+
+    def max_moves_to_furthest_cell(self, start_x, start_y):
+        visited = set([(start_x, start_y)])
+        queue = collections.deque([((start_x, start_y), 0)])
+        max_moves = 0
+
+        while queue:
+            current_posit, dist = queue.popleft()
+
+            if dist > max_moves:
+                max_moves = dist
+
+            for next_posit in self.get_moves(current_posit):
+                if next_posit not in visited:
+                    visited.add(next_posit)
+                    queue.append((next_posit, dist + 1))
+
+        return max_moves
+
+
+def run_file_test(input_filename, output_filename):
+    status_message = f"Success. Check '{output_filename}'"
+
+    try:
+        with open(input_filename, 'r', encoding='utf-8') as f_in:
+            lines = [line.split("#")[0].strip() for line in f_in if line.strip()]
+
+        n = int(lines[0])
+
+        start_parts = lines[1].split(',')
+        start_x, start_y = int(start_parts[0].strip()), int(start_parts[1].strip())
+
+        dest_parts = lines[2].split(',')
+        dest_x, dest_y = int(dest_parts[0].strip()), int(dest_parts[1].strip())
+
+        solver = KnightSolution(n)
+
+        path = solver.find_shortest_way(start_x, start_y, dest_x, dest_y)
+        shortest_path_len = len(path) - 1 if path else -1
+
+        furthest_cell_moves = solver.max_moves_to_furthest_cell(start_x, start_y)
+
+        with open(output_filename, 'w', encoding='utf-8') as f_out:
+            f_out.write(f"Shortest path: {shortest_path_len}\n")
+            f_out.write(f"Max moves: {furthest_cell_moves}\n")
+
+    except Exception as e:
+        status_message = f"Error: {e}"
+
+    return status_message
+
+
+if __name__ == "__main__":
+    if not os.path.exists("input.txt"):
+        with open("input.txt", "w", encoding='utf-8') as f:
+            f.write("8\n7, 0\n0, 7")
+
+    result = run_file_test("input.txt", "output.txt")
+    print(result)
