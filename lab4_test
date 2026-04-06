@@ -1,0 +1,30 @@
+from lab4 import RBPriorityQueue
+
+def run_tests():
+    pq = RBPriorityQueue()
+
+    tasks = [
+        ("2", 2),
+        ("4", 10),
+        ("1", 1),
+        ("3", 8)
+    ]
+
+    print("ТЕСТ")
+    for name, priority in tasks:
+        print(f" '{name}' з пріоритетом {priority}")
+        pq.insert(name, priority)
+
+    print("\n Тестування Peek")
+    highest = pq.peek()
+    print(f"елемент з найвищим пріоритетом  {highest}")
+
+    print("\n тестування Extract Max")
+    while True:
+        item = pq.extract_max()
+        if item is None:
+            break
+        print(f"вилучено: {item[0]} (пріоритет: {item[1]})")
+
+if name == "main":
+    run_tests()
